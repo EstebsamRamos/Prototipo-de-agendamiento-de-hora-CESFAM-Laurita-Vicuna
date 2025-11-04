@@ -68,8 +68,15 @@
     <h2 id="formTitle">Agendar cita (simulación)</h2>
     <p style="margin:0 0 8px 0; color:var(--muted)">Complete los datos. Solo lunes–viernes. Horarios: 08:30 → 19:30 (cada 60 min). El sistema guarda tiempo y encuesta.</p>
 
-    <label for="rut">RUT (sin puntos, con guion) — ej: 12345678-5</label>
-    <input id="rut" type="text" maxlength="10" placeholder="12345678-5" autocomplete="off" inputmode="text" />
+ <label for="rut">RUT (sin puntos, con guion) — ej: 12345678-5</label>
+ <input id="rut"
+       type="text"
+       maxlength="10"
+       placeholder="12345678-5"
+       autocomplete="off"
+       inputmode="text"
+       pattern="^\d{7,8}-[\dKk]$"
+       title="Debe tener 7 u 8 números, un guion y un dígito o K/k. Ej: 12345678-5" />
 
     <div class="row">
       <div class="col">
