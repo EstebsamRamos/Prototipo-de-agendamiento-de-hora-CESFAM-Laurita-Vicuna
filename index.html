@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Agendamiento CESFAM Laurita Vicuña(Prototipo)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Agendamiento CESFAM Laurita Vicuña — Prototipo Final</title>
+
 <style>
   :root{
-    --azul:#3e44a0;      /* azul base */
-    --azul-dark:#003c7d;
-    --acento:#f4a300;    /* naranja/acento */
-    --bg:#fbfbf3;
+    --azul-1:#003c7d;
+    --azul-2:#2e5bb7;
+    --naranja:#f4a300;
+    --bg:#f6f8fb;
     --card:#ffffff;
     --muted:#5b6b78;
     --success:#0f9d58;
@@ -18,65 +19,72 @@
     --radius:12px;
   }
   *{box-sizing:border-box}
-  body{font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif; margin:0; background:var(--bg); color:#12232b;}
-  header{background:var(--azul); color:#fff; display:flex; gap:12px; align-items:center; padding:14px 18px;}
-  header img{height:52px; border-radius:10px; border:2px solid rgba(255,255,255,0.12);}
-  header .title{font-weight:700; font-size:18px}
-  header .sub{font-size:12px; opacity:0.95}
+  body{font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif; margin:0; background:var(--bg); color:#0f1720; -webkit-font-smoothing:antialiased;}
+  header{
+    color:#fff;
+    padding:18px 22px;
+    background: linear-gradient(90deg, var(--azul-1) 0%, var(--azul-2) 60%, var(--naranja) 100%);
+    display:flex; align-items:center; gap:14px;
+  }
+  header img{height:56px; width:56px; object-fit:cover; border-radius:10px; border:2px solid rgba(255,255,255,0.12)}
+  header .brand{font-weight:800; font-size:18px}
+  header .sub{font-size:13px; opacity:0.95}
   main{max-width:1200px; margin:20px auto; padding:14px; display:grid; grid-template-columns:1fr 420px; gap:18px;}
-  .card{background:var(--card); padding:18px; border-radius:var(--radius); box-shadow:0 10px 30px rgba(16,24,40,0.06);}
-  h2{color:var(--azul); margin:0 0 8px 0}
+  .card{background:var(--card); padding:18px; border-radius:var(--radius); box-shadow:0 10px 30px rgba(16,24,40,0.06)}
+  h2{color:var(--azul-1); margin:0 0 8px 0}
   label{display:block; font-size:13px; color:var(--muted); margin-top:10px}
   input[type=text], input[type=tel], input[type=email], select, textarea {
-    width:100%; padding:10px; border-radius:8px; border:1px solid var(--borde); font-size:14px;
+    width:100%; padding:10px; border-radius:8px; border:1px solid var(--borde); font-size:14px; background:#fff;
   }
   textarea{min-height:72px; resize:vertical}
   .row{display:flex; gap:8px}
   .row .col{flex:1}
-  button{background:var(--azul); color:#fff; padding:10px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600}
-  button.ghost{background:transparent; color:var(--azul); border:1px solid var(--borde)}
-  .msg{padding:10px; border-radius:8px; margin-top:12px; display:none}
-  .msg.success{background:#e9f7ee; color:var(--success); border:1px solid rgba(15,157,88,0.12)}
-  .msg.error{background:#fff0f0; color:var(--danger); border:1px solid rgba(197,48,48,0.12)}
-  .kpi{background:#f7fbff; border-left:4px solid var(--acento); padding:10px; border-radius:8px; margin:8px 0}
-  table{width:100%; border-collapse:collapse; margin-top:8px}
-  th,td{padding:8px; border-bottom:1px solid #f1f6f9; font-size:13px; text-align:left}
+  button{background:var(--azul-1); color:#fff; padding:10px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600}
+  button.ghost{background:transparent; color:var(--azul-1); border:1px solid var(--borde)}
+  .msg{padding:12px; border-radius:8px; margin-top:12px; display:none; font-weight:600; text-align:center}
+  .msg.success{background:#eaf6ef; color:var(--success); border:1px solid rgba(15,157,88,0.12)}
+  .msg.error{background:#fff4f4; color:var(--danger); border:1px solid rgba(197,48,48,0.12)}
+  .kpi{background:linear-gradient(180deg,#fff,#f7fbff); border-left:4px solid var(--naranja); padding:10px; border-radius:8px; margin:8px 0}
+  table{width:100%; border-collapse:collapse; margin-top:8px; font-size:13px}
+  th,td{padding:8px; border-bottom:1px solid #f1f6f9; text-align:left}
   .controls{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
   .small{font-size:13px}
   #chartCard{margin-top:12px}
-  @media(max-width:1050px){main{grid-template-columns:1fr; padding:12px}}
+  .rut-group{position:relative}
+  .rut-icon{position:absolute; right:12px; top:38px; font-size:16px; pointer-events:none}
+  .rut-icon.valid{color:var(--success)}
+  .rut-icon.invalid{color:var(--danger)}
+  .muted-note{font-size:12px; color:var(--muted); margin-top:8px}
+  @media (max-width:1050px){ main{grid-template-columns:1fr; padding:12px} }
 </style>
-<!-- Chart.js CDN -->
+
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
 <header>
-  <img id="logoImg" src="https://i.ibb.co/WvTvsFLZ/loglaurita-cesfam.jpg" alt="CESFAM Laurita Vicuña logo">
+  <img src="https://i.ibb.co/WvTvsFLZ/loglaurita-cesfam.jpg" alt="Logo">
   <div>
-    <div class="title">CESFAM Laurita Vicuña — Puente Alto</div>
-    <div class="sub">Prototipo agendamiento</div>
+    <div class="brand">CESFAM Laurita Vicuña — Puente Alto</div>
+    <div class="sub">Prototipo de Agendamiento · Interfaz Bicolor</div>
   </div>
-  <div style="margin-left:auto; text-align:right;">
-    <div id="holidayStatus" style="font-size:12px; color:#eaf7ff">Cargando feriados...</div>
-    <div id="holidayCount" style="font-size:12px; color:#eaf7ff; opacity:0.9"></div>
+  <div style="margin-left:auto;text-align:right;">
+    <div style="font-size:12px;opacity:0.95">Prototipo — datos locales</div>
   </div>
 </header>
 
 <main>
-  <!-- FORM + Survey -->
+  <!-- FORM + SURVEY -->
   <section class="card" aria-labelledby="formTitle">
     <h2 id="formTitle">Agendar cita (simulación)</h2>
-    <p style="margin:0 0 8px 0; color:var(--muted)">Complete los datos. Solo lunes–viernes. Horarios: 08:30 → 19:30 (cada 60 min). El sistema guarda tiempo y encuesta.</p>
+    <p style="margin:0 0 8px 0; color:var(--muted)">Complete los datos. Lunes–viernes. Horarios: 08:30 → 19:30 (intervalo 60 min).</p>
 
- <label for="rut">RUT (sin puntos, con guion) — ej: 12345678-5</label>
- <input id="rut"
-       type="text"
-       maxlength="10"
-       placeholder="12345678-5"
-       autocomplete="off"
-       inputmode="text"
-       pattern="^\d{7,8}-[\dKk]$"
-       title="Debe tener 7 u 8 números, un guion y un dígito o K/k. Ej: 12345678-5" />
+    <div class="rut-group">
+      <label for="rut">RUT (sin puntos, con guion) — ej: 12345678-K</label>
+      <input id="rut" type="text" maxlength="10" placeholder="12345678-K" autocomplete="off" inputmode="text" />
+      <span id="rutIcon" class="rut-icon" aria-hidden="true"></span>
+    </div>
 
     <div class="row">
       <div class="col">
@@ -91,6 +99,7 @@
 
     <label for="especialidad">Especialidad</label>
     <select id="especialidad" aria-controls="medico">
+      <option value="">Seleccione...</option>
       <option value="Medicina General">Medicina General</option>
       <option value="Pediatría">Pediatría</option>
       <option value="Psicología">Psicología</option>
@@ -123,39 +132,61 @@
     <hr style="margin:16px 0; border:none; border-top:1px solid #f0f4f8" />
 
     <h3 style="margin:6px 0">Encuesta post-uso</h3>
-    <p style="margin:0 0 8px 0; color:var(--muted)">Responda las mismas preguntas que en las entrevistas realizadas.</p>
+    <p style="margin:0 0 8px 0; color:var(--muted)">Responda las preguntas (campos en blanco por defecto).</p>
 
     <label for="q1">1) ¿Qué tan fácil fue agendar? (1-5)</label>
-    <select id="q1">
+    <select id="q1" aria-label="q1">
+      <option value="">Seleccione...</option>
       <option value="1">1 - Muy difícil</option>
       <option value="2">2 - Difícil</option>
       <option value="3">3 - Regular</option>
-      <option value="4" selected>4 - Fácil</option>
+      <option value="4">4 - Fácil</option>
       <option value="5">5 - Muy fácil</option>
     </select>
 
     <label for="q2">2) ¿Cuánto tiempo te tomó completar el agendamiento?</label>
-    <select id="q2"><option value="<2">&lt; 2 min</option><option value="2-3">2–3 min</option><option value=">3">&gt; 3 min</option></select>
+    <select id="q2" aria-label="q2">
+      <option value="">Seleccione...</option>
+      <option value="<2">&lt; 2 min</option>
+      <option value="2-3">2–3 min</option>
+      <option value=">3">&gt; 3 min</option>
+    </select>
 
     <label for="q3">3) ¿Tuviste algún error o impedimento? (Sí/No)</label>
-    <select id="q3"><option value="No" selected>No</option><option value="Si">Sí</option></select>
+    <select id="q3" aria-label="q3">
+      <option value="">Seleccione...</option>
+      <option value="No">No</option>
+      <option value="Si">Sí</option>
+    </select>
     <label class="small" for="q3txt">Si Sí, describa (opcional)</label>
     <textarea id="q3txt" placeholder="Describa el error (opcional)"></textarea>
 
     <label for="q4">4) ¿Preferirías usar este sistema en lugar de la fila/telefono? (Sí/No)</label>
-    <select id="q4"><option value="Si">Sí</option><option value="No">No</option></select>
+    <select id="q4" aria-label="q4">
+      <option value="">Seleccione...</option>
+      <option value="Si">Sí</option>
+      <option value="No">No</option>
+    </select>
     <label class="small" for="q4txt">¿Por qué? (opcional)</label>
     <textarea id="q4txt" placeholder="Comentario (opcional)"></textarea>
 
     <label for="q5">5) ¿Los recordatorios (SMS/Email) ayudarían a asistir? (Sí/No)</label>
-    <select id="q5"><option value="Si">Sí</option><option value="No">No</option></select>
+    <select id="q5" aria-label="q5">
+      <option value="">Seleccione...</option>
+      <option value="Si">Sí</option>
+      <option value="No">No</option>
+    </select>
     <label class="small" for="q5txt">Describa (opcional)</label>
     <textarea id="q5txt" placeholder="Comentario (opcional)"></textarea>
 
-    <div class="small" style="margin-top:10px; color:var(--muted)">Al confirmar, los datos se guardan localmente y (si está configurado) se envían a Firestore para almacenamiento centralizado.</div>
+    <div style="margin-top:12px">
+      <button id="btnSendSurvey" class="ghost" type="button">Enviar encuesta (asociada a la última cita)</button>
+    </div>
+
+    <div class="small muted-note">Los datos se guardan localmente. Para almacenar en la nube, configura Firebase más abajo.</div>
   </section>
 
-  <!-- Analytics / controls -->
+  <!-- METRICAS / HISTORIAL -->
   <aside class="card">
     <h2>Registro & métricas</h2>
 
@@ -164,13 +195,13 @@
     <div class="kpi"><strong>Errores detectados</strong><div id="kpiErr">--</div></div>
 
     <label style="margin-top:12px">Historial (últimas reservas)</label>
-    <table><thead><tr><th>RUT</th><th>Tel</th><th>Email</th><th>Esp</th><th>Med</th><th>Fecha</th><th>Hora</th><th>Dur(s)</th></tr></thead>
+    <table aria-live="polite"><thead><tr><th>RUT</th><th>Tel</th><th>Email</th><th>Esp</th><th>Med</th><th>Fecha</th><th>Hora</th><th>Dur(s)</th></tr></thead>
     <tbody id="historyBody"></tbody></table>
 
     <div id="chartCard" class="card" style="margin-top:12px;padding:12px;">
-      <h3 style="margin:0 0 8px 0">Satisfacción — % respuestas positivas</h3>
+      <h3 style="margin:0 0 8px 0">Satisfacción — % positivas</h3>
       <canvas id="surveyChart" width="400" height="240"></canvas>
-      <div style="font-size:12px; color:var(--muted); margin-top:8px">Positivo = Q1 (4-5), Q2 (&lt;=3), Q3 (No errores), Q4 (Sí), Q5 (Sí)</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:8px">Positivo = Q1 (4-5), Q2 (&lt;=3), Q3 (No), Q4 (Sí), Q5 (Sí)</div>
     </div>
 
     <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
@@ -180,25 +211,18 @@
     </div>
 
     <div style="margin-top:10px; font-size:12px; color:var(--muted)">
-      <div>Feriados provistos por Google Calendar (Chile). Si la descarga falla, se usa lista local editable.</div>
-      <div style="margin-top:6px">Si quieres almacenar centralmente los registros, configura Firebase en la sección <code>FIREBASE CONFIG</code> en el código y habilita Firestore.</div>
+      <div>Feriados provistos por Google Calendar (Chile). Si falla, se usa lista local.</div>
+      <div style="margin-top:6px">Configura Firebase en `FIREBASE_CONFIG` si deseas almacenar en la nube.</div>
     </div>
   </aside>
 </main>
 
-<!-- Optional Firebase SDK (loaded only if firebaseConfig is provided in the config below) -->
+<!-- SCRIPT PRINCIPAL -->
 <script>
-/* ========== CONFIG - PERSONALIZA ESTO ==========
-
-  1) Si no quieres usar la nube, deja FIREBASE_CONFIG = null.
-  2) Si quieres almacenar en la nube, crea un proyecto en Firebase,
-     habilita Firestore en modo seguro, copia el firebaseConfig JSON y
-     pega en FIREBASE_CONFIG (ver instrucciones al final del archivo).
-
-  NOTA: la app funciona perfectamente con localStorage sin Firebase.
+/* ================= CONFIG =================
+   Si no usarás Firebase deja FIREBASE_CONFIG = null
 */
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyD4Gh5tyysf9j65FnLjT0zrpQkfkBHP6Zs",
   authDomain: "prototipo-horas-cesfam.firebaseapp.com",
   projectId: "prototipo-horas-cesfam",
@@ -206,27 +230,22 @@ const firebaseConfig = {
   messagingSenderId: "826786267788",
   appId: "1:826786267788:web:b0a6aeb9b81fb46982b1a9",
   measurementId: "G-X2T7EEP436"
-}; ;
-const FIRESTORE_COLLECTION = "cesfam_citas"; // colección en Firestore donde se escriben los registros
-
-// ========== CONSTANTES ==========
+}; // o null si no usar
+const FIRESTORE_COLLECTION = "cesfam_citas";
 const ICS_URL = "https://calendar.google.com/calendar/ical/es.cl%23holiday%40group.v.calendar.google.com/public/basic.ics";
-const LOCAL_HOLIDAYS = ["2025-01-01","2025-05-01","2025-09-18","2025-09-19","2025-12-25"]; // respaldo editable
+const LOCAL_HOLIDAYS = ["2025-01-01","2025-05-01","2025-09-18","2025-09-19","2025-12-25"];
 const SLOT_START = {h:8,m:30}, SLOT_END = {h:19,m:30}, SLOT_INTERVAL_MIN = 60;
 
-// Médicos (por especialidad)
+/* ================= UTIL & CONSTANTES ================= */
 const MEDICOS = {
   "Medicina General":["Dr. 1","Dr. 2","Dr. 3","Dr. 4","Dr. 5"],
-  "Pediatría":["Dr. 1","Dr. 2","Dr. 3","Dr. 4","Dr. 5"],
-  "Psicología":["Dr. 1","Dr. 2","Dr. 3","Dr. 4","Dr. 5"],
-  "Odontología":["Dr. 1","Dr. 2","Dr. 3","Dr. 4","Dr. 5"],
-  "Cardiología":["Dr. 1","Dr. 2","Dr. 3","Dr. 4","Dr. 5"]
+  "Pediatría":["Dra. A","Dr. B","Dra. C"],
+  "Psicología":["Dra. X","Dr. Y"],
+  "Odontología":["Dr. O","Dra. P"],
+  "Cardiología":["Dr. K"]
 };
+const STORAGE_KEY = "cesfam_vfinal_appointments";
 
-// storage key
-const STORAGE_KEY = "cesfam_v11_appointments";
-
-// util
 const byId = id => document.getElementById(id);
 function pad(n){ return n<10 ? "0"+n : ""+n; }
 function yyyyMMdd(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
@@ -238,62 +257,42 @@ function generateSlots(){
 }
 const SLOTS = generateSlots();
 
-// RUT validation (expects format without dots, with hyphen)
-function validarRUTFormato(rut){
-  // pattern: 7-8 digits, hyphen, dv (digit or K)
-  return /^\d{7,8}-[\dKk]$/.test(rut);
-}
-function validarRUTDV(rut){
-  // rut without dots and with hyphen: 12345678-5 or 87654321-K
-  const clean = rut.replace(/\./g,"").replace(/-/g,"").toUpperCase();
-  if(clean.length < 2) return false;
-  const cuerpo = clean.slice(0,-1), dv = clean.slice(-1);
-  let suma = 0, mul = 2;
-  for(let i = cuerpo.length-1; i>=0; i--){ suma += parseInt(cuerpo[i]) * mul; mul = mul<7 ? mul+1 : 2; }
-  const res = 11 - (suma % 11);
-  const dvEsperado = res === 11 ? '0' : res === 10 ? 'K' : String(res);
-  return dv === dvEsperado;
-}
-
-// basic email & phone validators
-function validarEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
-function validarPhone(phone){ const digits = phone.replace(/\D/g,""); return digits.length >= 8; }
-
-// storage local
-function loadAppointments(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }catch(e){ return []; } }
-function saveAppointments(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-
-// UI refs
-const rutEl = byId('rut'), telEl = byId('telefono'), emailEl = byId('email');
+/* ================= ELEMENTOS UI ================= */
+const rutEl = byId('rut'), rutIcon = byId('rutIcon');
+const telEl = byId('telefono'), emailEl = byId('email');
 const espEl = byId('especialidad'), medEl = byId('medico'), dateEl = byId('fecha'), timeEl = byId('hora');
 const btnStart = byId('btnStart'), btnConfirm = byId('btnConfirm'), btnClear = byId('btnClear');
 const messageEl = byId('message'), historyBody = byId('historyBody');
 const kpiCount = byId('kpiCount'), kpiTime = byId('kpiTime'), kpiErr = byId('kpiErr');
 const exportBtn = byId('exportBtn'), resetBtn = byId('resetBtn'), refreshHols = byId('refreshHols');
-const holidayStatus = byId('holidayStatus'), holidayCount = byId('holidayCount');
 
-// survey refs
-const q1 = byId('q1'), q2 = byId('q2'), q3 = byId('q3'), q3txt = byId('q3txt'), q4 = byId('q4'), q4txt = byId('q4txt'), q5 = byId('q5'), q5txt = byId('q5txt');
+const q1 = byId('q1'), q2 = byId('q2'), q3 = byId('q3'), q3txt = byId('q3txt');
+const q4 = byId('q4'), q4txt = byId('q4txt'), q5 = byId('q5'), q5txt = byId('q5txt');
+const btnSendSurvey = byId('btnSendSurvey');
 
-// timer
 let timerStart = null, isTiming = false;
 function startTimerIfNeeded(){ if(!isTiming){ timerStart = Date.now(); isTiming = true; btnStart.disabled = true; btnStart.textContent = "Cronómetro activo"; } }
 
-// holidays list (filled by fetch or fallback)
+/* Holidays */
 let HOLIDAYS = [...LOCAL_HOLIDAYS];
 
-// Firebase variables (populated if FIREBASE_CONFIG provided)
+/* Firebase */
 let firebaseApp = null, firestoreDB = null, firebaseEnabled = false;
 
-// ========== Survey Chart (Chart.js) ==========
+/* Chart */
 let surveyChart = null;
+
+/* ================= VALIDACIONES ================= */
+function validarRUTFormato(rut){ return /^\d{7,8}-[\dKk]$/.test(rut); }
+function validarEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function validarPhone(phone){ const digits = phone.replace(/\D/g,""); return digits.length >= 8; }
+
+/* ================= STORAGE ================= */
+function loadAppointments(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }catch(e){ return []; } }
+function saveAppointments(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+/* ================= SURVEY CHART ================= */
 function computeSurveyPositivePercents(list){
-  // returns array [q1%, q2%, q3%, q4%, q5%] where positive defined as:
-  // q1: 4 or 5
-  // q2: "<2" or "2-3" => <=3 considered positive
-  // q3: "No" => no errors
-  // q4: "Si"
-  // q5: "Si"
   const totals = [0,0,0,0,0];
   if(!list || list.length===0) return [0,0,0,0,0];
   let count = 0;
@@ -301,16 +300,11 @@ function computeSurveyPositivePercents(list){
     if(!r.survey) return;
     count++;
     const s = r.survey;
-    // q1
-    const q1val = Number(s.q1);
-    if(q1val >= 4) totals[0]++;
-    // q2
+    const q1v = Number(s.q1);
+    if(q1v >= 4) totals[0]++;
     if(s.q2 === "<2" || s.q2 === "2-3") totals[1]++;
-    // q3
     if(s.q3 === "No") totals[2]++;
-    // q4
     if(s.q4 === "Si") totals[3]++;
-    // q5
     if(s.q5 === "Si") totals[4]++;
   });
   if(count === 0) return [0,0,0,0,0];
@@ -329,40 +323,27 @@ function renderSurveyChart(){
       datasets: [{
         label: '% respuestas positivas',
         data: percents,
-        backgroundColor: [
-          'rgba(0,76,151,0.8)',
-          'rgba(36,123,255,0.8)',
-          'rgba(0,200,83,0.8)',
-          'rgba(244,163,0,0.8)',
-          'rgba(197,48,48,0.8)'
-        ],
-        borderColor: [
-          'rgba(0,76,151,1)',
-          'rgba(36,123,255,1)',
-          'rgba(0,200,83,1)',
-          'rgba(244,163,0,1)',
-          'rgba(197,48,48,1)'
-        ],
+        backgroundColor: ['rgba(46,91,183,0.85)','rgba(46,91,183,0.6)','rgba(15,157,88,0.8)','rgba(244,163,0,0.85)','rgba(197,48,48,0.8)'],
+        borderColor: ['rgba(46,91,183,1)','rgba(46,91,183,1)','rgba(15,157,88,1)','rgba(244,163,0,1)','rgba(197,48,48,1)'],
         borderWidth: 1
       }]
     },
     options: {
-      scales: {
-        y: { beginAtZero:true, max:100, ticks: { stepSize:10, callback: v => v + '%' } }
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => ctx.parsed.y + '%'
-          }
-        }
-      }
+      scales: { y: { beginAtZero:true, max:100, ticks:{ stepSize:10, callback: v => v + '%' } } },
+      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => ctx.parsed.y + '%' } } }
     }
   });
 }
 
-// ========== Initialization ==========
+/* ================= UI HELPERS ================= */
+function showMessage(text, type="success", timeout=6000){
+  messageEl.style.display = "block"; messageEl.textContent = text;
+  messageEl.className = type === "success" ? "msg success" : "msg error";
+  if(messageEl._timeout) clearTimeout(messageEl._timeout);
+  messageEl._timeout = setTimeout(()=>{ messageEl.style.display = "none"; messageEl._timeout = null; }, timeout);
+}
+
+/* ================= MEDICOS / SLOTS ================= */
 function populateMedicos(){
   medEl.innerHTML = "";
   const list = MEDICOS[espEl.value] || [];
@@ -374,24 +355,46 @@ function populateSlots(){
   if(!dateEl.value){ timeEl.disabled = true; return; }
   const selDate = new Date(dateEl.value + "T00:00:00");
   const ymd = yyyyMMdd(selDate);
-  if(isWeekend(selDate) || HOLIDAYS.includes(ymd)){ const o = document.createElement('option'); o.value=""; o.textContent="No disponible (fin de semana/feriado)"; timeEl.appendChild(o); timeEl.disabled=true; return; }
+  if(isWeekend(selDate) || HOLIDAYS.includes(ymd)){ const o=document.createElement('option'); o.value=""; o.textContent="No disponible (fin de semana/feriado)"; timeEl.appendChild(o); timeEl.disabled=true; return; }
   const appts = loadAppointments();
   const booked = appts.filter(a => a.fecha === dateEl.value && a.medico === medEl.value).map(a => a.hora);
   SLOTS.forEach(slot => { if(!booked.includes(slot)){ const o=document.createElement('option'); o.value=slot; o.textContent=slot; timeEl.appendChild(o); } });
   if(timeEl.options.length === 0){ const o=document.createElement('option'); o.value=""; o.textContent="No quedan horas disponibles"; timeEl.appendChild(o); timeEl.disabled=true; } else timeEl.disabled=false;
 }
-
 function isWeekend(date){ const d = date.getDay(); return d === 0 || d === 6; }
 function inRangeTime(timeStr){ return timeStr >= '08:30' && timeStr <= '19:30'; }
 
-// show messages
-function showMessage(text, type="success"){
-  messageEl.style.display = "block"; messageEl.textContent = text;
-  messageEl.className = type === "success" ? "msg success" : "msg error";
-  setTimeout(()=>{ messageEl.style.display = "none"; }, 7000);
+/* ================= RUT behavior ================= */
+function limpiarYFormatearRUT(val){
+  val = String(val || "").replace(/[.\s]/g, "");
+  val = val.replace(/[^0-9Kk\-]/g, '');
+  const only = val.replace(/-/g, '');
+  if(only.length >= 2){
+    const cuerpo = only.slice(0, -1).slice(0, 8);
+    const dv = only.slice(-1);
+    val = cuerpo + '-' + dv;
+  } else {
+    val = only;
+  }
+  if(val.length > 10) val = val.slice(0, 10);
+  return val;
 }
+function updateRutIcon(){
+  const val = rutEl.value.trim();
+  if(val === ""){
+    rutIcon.textContent = ""; rutIcon.className = "rut-icon";
+    return;
+  }
+  if(validarRUTFormato(val)){
+    rutIcon.textContent = "✅"; rutIcon.className = "rut-icon valid";
+  }else{
+    rutIcon.textContent = "❌"; rutIcon.className = "rut-icon invalid";
+  }
+}
+rutEl.addEventListener('input', (e) => { e.target.value = limpiarYFormatearRUT(e.target.value); updateRutIcon(); });
+rutEl.addEventListener('blur', (e) => { let v = e.target.value.trim(); if(v){ e.target.value = limpiarYFormatearRUT(v.toUpperCase()); updateRutIcon(); } });
 
-// History & KPIs
+/* ================= HISTORY / KPIS ================= */
 function renderHistory(){
   const list = loadAppointments();
   historyBody.innerHTML = "";
@@ -405,12 +408,10 @@ function renderHistory(){
   kpiCount.textContent = list.length;
   kpiTime.textContent = countDur>0 ? Math.round(totalDur/countDur) + " s" : "--";
   kpiErr.textContent = list.length>0 ? Math.round((errCount/list.length)*100) + " %" : "--";
-
-  // update chart
   renderSurveyChart();
 }
 
-// Export CSV
+/* ================= CSV & reset ================= */
 function exportCSV(){
   const list = loadAppointments();
   if(!list.length){ showMessage("No hay datos para exportar","error"); return; }
@@ -418,23 +419,19 @@ function exportCSV(){
   const rows = list.map(r => header.map(h => (r[h]!==undefined && r[h]!==null) ? String(r[h]).replace(/,/g,"") : "").join(","));
   const csv = header.join(",") + "\n" + rows.join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "cesfam_v11_citas.csv"; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "cesfam_citas.csv"; a.click();
 }
-
-// Clear local data
 function resetLocal(){
   if(!confirm("¿Borrar todas las citas guardadas en este navegador?")) return;
   localStorage.removeItem(STORAGE_KEY); renderHistory(); showMessage("Datos locales borrados","success");
 }
 
-// Fetch holidays from Google ICS (may be blocked by CORS — fallback to LOCAL_HOLIDAYS)
+/* ================= HOLIDAYS ================= */
 async function fetchHolidays(){
   try{
-    holidayStatus.textContent = "Obteniendo feriados desde Google...";
     const res = await fetch(ICS_URL);
     if(!res.ok) throw new Error("Fetch no OK");
     const txt = await res.text();
-    // parse DTSTART lines
     const dates = [];
     txt.split(/\r?\n/).forEach(ln => {
       if(ln.startsWith("DTSTART")){
@@ -444,158 +441,157 @@ async function fetchHolidays(){
         }
       }
     });
-    if(dates.length>0){ HOLIDAYS = Array.from(new Set(dates)); holidayStatus.textContent = "Feriados cargados (Google)"; holidayCount.textContent = `${HOLIDAYS.length} feriados`; return; }
+    if(dates.length>0){ HOLIDAYS = Array.from(new Set(dates)); return; }
     throw new Error("No dates parsed");
   }catch(err){
-    console.warn("ICS fetch failed:", err);
     HOLIDAYS = [...LOCAL_HOLIDAYS];
-    holidayStatus.textContent = "Usando feriados locales (fallback)";
-    holidayCount.textContent = `${HOLIDAYS.length} feriados (fallback)`;
   }
 }
 
-// send record to firebase if available
+/* ================= FIREBASE ================= */
+async function initFirebaseIfConfigured(){
+  if(!FIREBASE_CONFIG) return;
+  try{
+    const s1 = document.createElement('script'); s1.src = "https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"; document.head.appendChild(s1);
+    await new Promise(r => s1.onload = r);
+    const s2 = document.createElement('script'); s2.src = "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"; document.head.appendChild(s2);
+    await new Promise(r => s2.onload = r);
+    firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    firestoreDB = firebase.firestore();
+    firebaseEnabled = true;
+    console.log("Firebase inicializado.");
+  }catch(e){
+    console.warn("Firebase no disponible:", e);
+    firebaseEnabled = false;
+  }
+}
 async function sendToFirestore(record){
   if(!firebaseEnabled || !firestoreDB) return false;
-  try{
-    await firestoreDB.collection(FIRESTORE_COLLECTION).add(record);
-    return true;
-  }catch(e){
-    console.warn("Error writing to Firestore:", e);
-    return false;
-  }
+  try{ await firestoreDB.collection(FIRESTORE_COLLECTION).add(record); return true; }catch(e){ console.warn("Error Firestore:", e); return false; }
 }
 
-// Confirm appointment
+/* ================= CONFIRM APPOINTMENT ================= */
 async function confirmAppointment(){
   const rut = rutEl.value.trim();
   const tel = telEl.value.trim();
   const email = emailEl.value.trim();
   const esp = espEl.value;
   const med = medEl.value;
-  const fecha = dateEl.value;
-  const hora = timeEl.value;
+  const fechaVal = dateEl.value;
+  const horaVal = timeEl.value;
 
-  // validations
-  if(!validarRUTFormato(rut)){ showMessage("Error: RUT debe ser sin puntos y con guion (ej: 12345678-5)","error"); return; }
-  if(!validarRUTDV(rut)){ showMessage("Error: RUT inválido (dígito verificador incorrecto)","error"); return; }
+  if(!validarRUTFormato(rut)){ showMessage("Error: RUT debe tener formato: 7–8 dígitos, sin puntos, con guion y DV (0-9 o K).","error"); return; }
   if(!validarPhone(tel)){ showMessage("Error: teléfono inválido","error"); return; }
   if(!validarEmail(email)){ showMessage("Error: correo inválido","error"); return; }
-  if(!fecha){ showMessage("Error: seleccione fecha","error"); return; }
-  const selDate = new Date(fecha + "T00:00:00");
+  if(!fechaVal){ showMessage("Error: seleccione fecha","error"); return; }
+  const selDate = new Date(fechaVal + "T00:00:00");
   const ymd = yyyyMMdd(selDate);
   if(isWeekend(selDate) || HOLIDAYS.includes(ymd)){ showMessage("Error: fecha es fin de semana o feriado","error"); return; }
-  if(!hora || !inRangeTime(hora)){ showMessage("Error: seleccione hora válida entre 08:30 y 19:30","error"); return; }
+  if(!horaVal || !inRangeTime(horaVal)){ showMessage("Error: seleccione hora válida entre 08:30 y 19:30","error"); return; }
 
-  // avoid double booking same medico+date+hour
   const list = loadAppointments();
-  if(list.find(a => a.medico === med && a.fecha === fecha && a.hora === hora)){
-    showMessage(`Error: ${med} ya tiene cita a las ${hora} en ${fecha}`, "error"); return;
+  if(list.find(a => a.medico === med && a.fecha === fechaVal && a.hora === horaVal)){
+    showMessage(`Error: ${med} ya tiene cita a las ${horaVal} en ${fechaVal}`, "error"); return;
   }
 
-  // duration
   const durationSec = isTiming && timerStart ? Math.round((Date.now() - timerStart)/1000) : null;
 
-  // survey (read current values from survey fields)
-  const survey = {
-    q1: q1.value, q2: q2.value, q3: q3.value, q3txt: q3txt.value.trim(),
-    q4: q4.value, q4txt: q4txt.value.trim(), q5: q5.value, q5txt: q5txt.value.trim()
-  };
-
   const record = {
-    rut, telefono: tel, email, especialidad: esp, medico: med, fecha, hora,
-    durationSec, survey, timestamp: nowISO()
+    rut,
+    telefono: tel,
+    email,
+    especialidad: esp,
+    medico: med,
+    fecha: fechaVal,
+    hora: horaVal,
+    durationSec,
+    survey: null, // encuesta se agrega con botón "Enviar encuesta"
+    timestamp: nowISO()
   };
 
-  // save local
   list.push(record);
   saveAppointments(list);
 
-  // update contact/email for same RUT across records to latest
+  // update contact info for same RUT
   const updated = list.map(a => a.rut === rut ? {...a, telefono: tel, email: email} : a);
   saveAppointments(updated);
 
-  // attempt cloud save if enabled
   let cloudOk = false;
-  if(firebaseEnabled){ cloudOk = await sendToFirestore(record); }
+  if(firebaseEnabled) cloudOk = await sendToFirestore(record);
 
-  // reset timer and UI
   timerStart = null; isTiming = false; btnStart.disabled = false; btnStart.textContent = "Comenzar (iniciar medición)";
 
-  populateSlots(); renderHistory();
-  showMessage(`✅ Cita agendada: ${fecha} ${hora} con ${med}. Duración: ${durationSec !== null ? durationSec + " s" : "no registrada"}${cloudOk ? " (guardada en la nube)" : ""}`, "success");
+  populateSlots();
+  renderHistory();
+  showMessage(`✅ Cita agendada: ${fechaVal} ${horaVal} con ${med}. Duración: ${durationSec !== null ? durationSec + " s" : "no registrada"}${cloudOk ? " (guardada en la nube)" : ""}`, "success", 7000);
 
-  // clear fields that could cause duplicate
+  // reset fields that cause duplicate
   dateEl.value = ""; timeEl.innerHTML = "";
-  q3txt.value = ""; q4txt.value = ""; q5txt.value = "";
 }
 
-// Attach events
+/* ================= SEND SURVEY (attach to last appointment) ================= */
+async function sendSurvey(){
+  const list = loadAppointments();
+  if(!list.length){ showMessage("No hay citas para asociar la encuesta. Agende primero.","error"); return; }
+  const last = list[list.length - 1]; // associate to last saved appointment
+  const surveyObj = {
+    q1: q1.value,
+    q2: q2.value,
+    q3: q3.value,
+    q3txt: q3txt.value.trim(),
+    q4: q4.value,
+    q4txt: q4txt.value.trim(),
+    q5: q5.value,
+    q5txt: q5txt.value.trim()
+  };
+  last.survey = surveyObj;
+  last.surveyTimestamp = nowISO();
+  saveAppointments(list);
+  renderHistory();
+  showMessage("✅ Encuesta enviada correctamente y asociada a la última cita", "success", 5000);
+
+  // optionally send survey to firestore (update)
+  if(firebaseEnabled){
+    try{
+      // simplest approach: write a document with timestamp and survey (no update of original doc because we don't track doc IDs here)
+      await firestoreDB.collection(FIRESTORE_COLLECTION + "_surveys").add({appointment:last, survey:surveyObj, ts: nowISO()});
+    }catch(e){
+      console.warn("No se pudo guardar encuesta en Firestore:", e);
+    }
+  }
+}
+
+/* ================= EVENTS ================= */
 espEl.addEventListener('change', ()=> populateMedicos());
 medEl.addEventListener('change', ()=> { if(dateEl.value) populateSlots(); });
 dateEl.addEventListener('change', ()=> populateSlots());
-btnClear.addEventListener('click', ()=> { rutEl.value = ""; telEl.value=""; emailEl.value=""; dateEl.value=""; timeEl.innerHTML=""; espEl.selectedIndex=0; populateMedicos(); showMessage("Formulario limpiado","success"); });
+btnClear.addEventListener('click', ()=> { rutEl.value = ""; rutIcon.textContent=""; telEl.value=""; emailEl.value=""; dateEl.value=""; timeEl.innerHTML=""; espEl.selectedIndex=0; populateMedicos(); showMessage("Formulario limpiado","success"); });
 btnStart.addEventListener('click', ()=> { startTimerIfNeeded(); });
 btnConfirm.addEventListener('click', ()=> { confirmAppointment(); });
+btnSendSurvey.addEventListener('click', ()=> { sendSurvey(); });
 
 // export & reset
 exportBtn.addEventListener('click', exportCSV);
 resetBtn.addEventListener('click', resetLocal);
-refreshHols.addEventListener('click', ()=> { fetchHolidays(); });
+refreshHols.addEventListener('click', ()=> { fetchHolidays().then(()=> showMessage("Feriados actualizados (fallback si falla)","success")).catch(()=> showMessage("No se pudieron actualizar feriados","error")); });
 
 // start timer on first input
 ['input','change'].forEach(evt => {
   [rutEl,telEl,emailEl,espEl,medEl,dateEl,timeEl].forEach(el => el.addEventListener(evt, ()=> startTimerIfNeeded(), {once:false}));
 });
 
-// sanitize RUT input: only digits, hyphen and K/k allowed (no dots)
-rutEl.addEventListener('input', (e) => {
-  let val = e.target.value.replace(/[^0-9Kk\-]/g, '');
-
-  // If more than one hyphen, keep first only
-  const parts = val.split('-');
-  if (parts.length > 2) {
-    val = parts[0] + '-' + parts.slice(1).join('').replace(/-/g, '');
-  }
-
-  // Limit to 10 chars (e.g. 12345678-5)
-  if (val.length > 10) val = val.slice(0, 10);
-
-  e.target.value = val;
-});
-
-// initialize UI defaults
-function init(){
+/* ================= INIT ================= */
+async function init(){
   populateMedicos();
-  // set date min = today
   const today = new Date(); dateEl.min = yyyyMMdd(today);
-  // fetch holidays
-  fetchHolidays().then(()=>{ renderHistory(); }).catch(()=>{ renderHistory(); });
-  // render existing
+  populateSlots();
+  await fetchHolidays().catch(()=>{});
   renderHistory();
-  // load firebase if config provided
-  if(FIREBASE_CONFIG){
-    // dynamic load firebase sdk
-    const s1 = document.createElement('script'); s1.src = "https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"; s1.onload = () => {
-      const s2 = document.createElement('script'); s2.src = "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js";
-      s2.onload = () => {
-        try{
-          firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
-          firestoreDB = firebase.firestore();
-          firebaseEnabled = true;
-          console.log("Firebase inicializado, Firestore activo.");
-        }catch(err){
-          console.warn("Error inicializando Firebase:", err);
-          firebaseEnabled = false;
-        }
-      };
-      document.head.appendChild(s2);
-    };
-    document.head.appendChild(s1);
-  }
+  if(FIREBASE_CONFIG) await initFirebaseIfConfigured();
 }
 init();
 
 </script>
+
 </body>
 </html>
